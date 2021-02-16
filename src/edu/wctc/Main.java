@@ -1,5 +1,6 @@
 package edu.wctc;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -9,28 +10,33 @@ public class Main {
     private static Scanner keyboard = new Scanner(System.in);
 
     public static void main(String[] args) {
-        System.out.println("Please begin by entering your birthday.");
-        LocalDate birthday = getDate();
+        try {
+            System.out.println("Please begin by entering your birthday.");
+            LocalDate birthday = getDate();
 
-        int choice;
-        do {
-            choice = doMenu();
+            int choice;
+            do {
+                choice = doMenu();
 
-            switch (choice) {
-                case 1:
-                    calculateAge(birthday);
-                    break;
-                case 2:
-                    System.out.println("Enter your friend's birthday.");
-                    LocalDate friend = getDate();
-                    calculateDifference(birthday, friend);
-                    break;
-                case 3:
-                    calculateRetirement(birthday);
-                    break;
-            }
+                switch (choice) {
+                    case 1:
+                        calculateAge(birthday);
+                        break;
+                    case 2:
+                        System.out.println("Enter your friend's birthday.");
+                        LocalDate friend = getDate();
+                        calculateDifference(birthday, friend);
+                        break;
+                    case 3:
+                        calculateRetirement(birthday);
+                        break;
+                }
 
-        } while (choice != 4);
+            } while (choice != 4);
+        } catch (InvalidDateException ide) {
+            System.out.println(ide.getMessage());
+            System.out.println("Program must exit. Goodbye.");
+        }
 
     }
 
@@ -78,7 +84,7 @@ public class Main {
         return choice;
     }
 
-    public static LocalDate getDate() {
+    public static LocalDate getDate() throws InvalidDateException {
         System.out.print("Enter year: ");
         int year = Integer.parseInt(keyboard.nextLine());
 
@@ -88,9 +94,13 @@ public class Main {
         System.out.print("Enter day: ");
         int day = Integer.parseInt(keyboard.nextLine());
 
-        LocalDate date = LocalDate.of(year, month, day);
+        try {
+            LocalDate date = LocalDate.of(year, month, day);
+            return date;
+        } catch (DateTimeException dte) {
+            throw new InvalidDateException(year, month, day);
+        }
 
-        return date;
     }
 
     public static void calculateAge(LocalDate birthday) {
